@@ -10,51 +10,56 @@ Creating a VBA code on excel to help Steve analyze stocks over the past years in
 ### Refactor of the Code
 The refactor of the original code is shown below; the reason for refactor is to make the code to run more efficiently by taking less step.
 
-'1a) Create a ticker Index
- ticketIndex = 0
-
-'1b) Create three output arrays
- Dim tickerVolumes(12) As Long
- Dim tickerStartingPrices(12) As Single
- Dim tickerEndingPrices(12) As Single
+    '1a) Create a ticker Index
+    ticketIndex = 0
     
-''2a) Create a for loop to initialize the tickerVolumes to zero.
-For i = 0 To 11
-  tickerVolumes(i) = 0
-  tickerStartingPrices(i) = 0
-  tickerEndingPrices(i) = 0    
-Next i
-            
-''2b) Loop over all the rows in the spreadsheet.
-For i = 2 To RowCount
+    '1b) Create three output arrays
+    Dim tickerVolumes(12) As Long
+    Dim tickerStartingPrices(12) As Single
+    Dim tickerEndingPrices(12) As Single
     
-  '3a) Increase volume for current ticker
-  tickerVolumes(tickerIndex) = tickerVolumes(tickerIndex) + Cells(i, 8).Value
+    ''2a) Create a for loop to initialize the tickerVolumes to zero.
+    For i = 0 To 11
+    
+        tickerVolumes(i) = 0
+        tickerStartingPrices(i) = 0
+        tickerEndingPrices(i) = 0
         
-  '3b) Check if the current row is the first row with the selected tickerIndex.
-  If Cells(i, 1).Value = tickers(tickerIndex) And Cells(i - 1, 1).Value <> tickers(tickerIndex) Then
-    tickerStartingPrices(tickerIndex) = Cells(i, 6).Value
-  End If
-         
-  '3c) check if the current row is the last row with the selected ticker
-  If Cells(i, 1).Value = tickers(tickerIndex) And Cells(i + 1, 1).Value <> tickers(tickerIndex) Then
-    tickerEndingPrices(tickerIndex) = Cells(i, 6).Value
-  End If
+    Next i
             
-  '3d Increase the tickerIndex.
-  If Cells(i, 1).Value = tickers(tickerIndex) And Cells(i + 1, 1).Value <> tickers(tickerIndex) Then
-    tickerIndex = tickerIndex + 1
-  End If
+    ''2b) Loop over all the rows in the spreadsheet.
+    For i = 2 To RowCount
     
-Next i
+        '3a) Increase volume for current ticker
+        tickerVolumes(tickerIndex) = tickerVolumes(tickerIndex) + Cells(i, 8).Value
+        
+        '3b) Check if the current row is the first row with the selected tickerIndex.
+         If Cells(i, 1).Value = tickers(tickerIndex) And Cells(i - 1, 1).Value <> tickers(tickerIndex) Then
+            tickerStartingPrices(tickerIndex) = Cells(i, 6).Value
+         End If
+         
+        '3c) check if the current row is the last row with the selected ticker
+         'If the next rowâ€™s ticker doesnâ€™t match, increase the tickerIndex.
+         If Cells(i, 1).Value = tickers(tickerIndex) And Cells(i + 1, 1).Value <> tickers(tickerIndex) Then
+            tickerEndingPrices(tickerIndex) = Cells(i, 6).Value
+        End If
+            
+        '3d Increase the tickerIndex.
+        If Cells(i, 1).Value = tickers(tickerIndex) And Cells(i + 1, 1).Value <> tickers(tickerIndex) Then
+            tickerIndex = tickerIndex + 1
+        End If
     
-'4) Loop through your arrays to output the Ticker, Total Daily Volume, and Return.
-For i = 0 To 11
-  Worksheets("All Stocks Analysis").Activate
-  Cells(4 + i, 1).Value = tickers(i)
-  Cells(4 + i, 2).Value = tickerVolumes(i)
-  Cells(4 + i, 3).Value = tickerEndingPrices(i) / tickerStartingPrices(i) - 1        
-Next i
+    Next i
+    
+    '4) Loop through your arrays to output the Ticker, Total Daily Volume, and Return.
+    For i = 0 To 11
+       
+        Worksheets("All Stocks Analysis").Activate
+        Cells(4 + i, 1).Value = tickers(i)
+        Cells(4 + i, 2).Value = tickerVolumes(i)
+        Cells(4 + i, 3).Value = tickerEndingPrices(i) / tickerStartingPrices(i) - 1
+        
+    Next i
     
 ### Analysis
 From 2017 data, we can clearly see that all except for TERP had a postive return. DQ, SEDG, and ENPH had the highest return of 199.4%, 184.5%, and 129.5% respectively. The stocks with the highest Total Daily Volume were SPWR, FSLR and CSIQ with amounts of 782,187,000, 684,181,400, and 310,592,800 respectively.  
@@ -62,11 +67,12 @@ From 2017 data, we can clearly see that all except for TERP had a postive return
 ![2017_Chart](/Charts/2017_Chart.png)
 
 However, the 2018 data are very different. From the 2018 chart below, we could see that most of the stocks has a negative return except for RUN and ENPH, which were the only two stocks with a positive return of 84% and 81.9% respectively. These two stocks also had the highest amount of Total Daily Volume of 502,757,101, and 607,473,500 respectively. 
+
 ![2018_Chart](/Charts/2018_Chart.png)
 
 In the screenshots below, we can see the first execution times for the original code and the refactored code for 2017 and 2018 data. There is a huge difference in terms of efficiency as the execution times decreased from 1.1875 seconds to 0.2617188 seconds and 1.140625 seconds to 0.25 seconds for 2017 data and 2018 data respectively. 
-![2017_ExecutionTimes](/Resources/VBA_Challenge_2017.png)
-![2018_ExecutionTimes](/Resources/VBA_Challenge_2018.png)
+
+![2017_ExecutionTimes](/Resources/VBA_Challenge_2017.png)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;![2018_ExecutionTimes](/Resources/VBA_Challenge_2018.png)
 
 ## Summary
 
